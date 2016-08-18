@@ -10,6 +10,11 @@ class NewVisitorTest(unittest.TestCase):
     def tearDown(self):
         self.browser.quit()
 
+    def check_for_row_in_list_tables(self, row_text):
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn(row_text, [row.text for row in rows])
+
     def test_can_start_a_list_and_retrieve_it_later(self):
         #user checks out app's homepage
         self.browser.get('http://localhost:8000')
@@ -30,9 +35,8 @@ class NewVisitorTest(unittest.TestCase):
         #when user hits enter, page updates and now says
         #"1: buy peacock feathers" as an item on a todo list
         inputbox.send_keys(Keys.ENTER)
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn('1: Buy peacock feathers', [row.text for row in rows])
+        self.check_for_row_in_list_tables('1: Buy peacock feathers')
+
         #the blank text box for new entries is stil there ...
         #user types "use peacock feathers to make a fly"
         inputbox = self.browser.find_element_by_id('id_new_item')
@@ -40,13 +44,9 @@ class NewVisitorTest(unittest.TestCase):
         inputbox.send_keys(Keys.ENTER)
 
         #page updates again now with both items
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn('1: Buy peacock feathers', [row.text for row in rows])
-        self.assertIn(
-            '2: Use peacock feathers to make a fly',
-            [row.text for row in rows]
-        )
+        self.check_for_row_in_list_tables('1: Buy peacock feathers')
+        self.check_for_row_in_list_tables('2: Use peacock feathers to make a fly')
+
         #how remember the list? user notices unique URL with explanatory text
         self.fail('Finish the test!')
 
