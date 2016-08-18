@@ -30,19 +30,25 @@ class NewVisitorTest(unittest.TestCase):
         #when user hits enter, page updates and now says
         #"1: buy peacock feathers" as an item on a todo list
         inputbox.send_keys(Keys.ENTER)
-
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertTrue(
-            any(row.text == '1: Buy peacock feathers' for row in rows),
-            "New to-do item did not appear in table"
-        )
+        self.assertIn('1: Buy peacock feathers', [row.text for row in rows])
         #the blank text box for new entries is stil there ...
         #user types "use peacock feathers to make a fly"
-        self.fail('Finish the test!')
-        #page updates again now with both items
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Use peacock feathers to make a fly')
+        inputbox.send_keys(Keys.ENTER)
 
+        #page updates again now with both items
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn('1: Buy peacock feathers', [row.text for row in rows])
+        self.assertIn(
+            '2: Use peacock feathers to make a fly',
+            [row.text for row in rows]
+        )
         #how remember the list? user notices unique URL with explanatory text
+        self.fail('Finish the test!')
 
         #user visits direct URL and sees todo list
 
